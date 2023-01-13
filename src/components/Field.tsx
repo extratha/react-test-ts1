@@ -1,26 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import { FormModel, FieldModel, fieldErrorMessage, formErrorMessage } from '../types/form'
 
-function App() {
+
+interface CustomFieldProps {
+  fieldModel: FieldModel,
+  fieldName?: string,
+  children: React.ReactNode,
+  errors?: fieldErrorMessage ;
+  [any: string]: any
+}
+const Field: React.FC<CustomFieldProps> = ({ formModel, fieldModel, fieldName, children, errors}: CustomFieldProps) => {
+  const [formModelState, setFormModelState] = useState(formModel)
+  const [fieldModelState, setFieldModelState] = useState(fieldModel || formModelState?.fields[fieldName||''] as FieldModel)
+  const [errorState, setErrorState] = useState(errors)
+  useEffect(() => {
+
+    console.log("🚀 ~ file: Field.tsx:16 ~ useEffect ~ fieldModelState", errors)
+    setErrorState(errors)
+  }, [errors])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="field">
+      <label>{fieldModelState.label}</label>
+      {children} 
+      {
+        errorState?.length ?
+        <div className='field-errors' style={{ color: 'red' }}>
+          {errorState.map((error: string, index: number) => {
+            return <span key={index} >{error}</span>
+          })}
+
+        </div>: null
+
+
+      }
     </div>
-  );
+  )
 }
 
-export default App;
+export default Field;

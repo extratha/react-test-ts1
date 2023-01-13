@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { FormModel, FieldModel } from '../../types/form'
 
-function App() {
+interface CustomFormProps {
+  fieldModel: FieldModel,
+}
+const InputText: React.FC<CustomFormProps> = (props) => {
+  const [fieldModelState,setFieldModelState] = useState(props.fieldModel) 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    let fieldModel = fieldModelState
+    fieldModel.value = value
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="input">
+      <input type={fieldModelState.type} name={fieldModelState.name} onChange={fieldModelState.onChange || handleChange} />
     </div>
   );
+
 }
 
-export default App;
+
+
+export default InputText;

@@ -1,4 +1,8 @@
-export interface FormField {
+export type fieldErrorMessage = [string] | []
+export interface formErrorMessage {
+    [any: string]: fieldErrorMessage
+}
+export interface FieldModel {
     name: string;
     label: string;
     type: string;
@@ -7,5 +11,11 @@ export interface FormField {
         required?: boolean;
         minLength?: number;
         maxLength?: number;
-    }
+    };
+    onChange?: (event: any) => void;
+    errors?: fieldErrorMessage;
+}
+export interface FormModel {
+    errors?: formErrorMessage;
+    fields: Record<string, any>;
 }

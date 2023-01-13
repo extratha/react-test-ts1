@@ -1,61 +1,48 @@
-import React, { useState } from 'react';
-import { FormField } from '../types/form'
+import React,  { useState } from 'react';
+import { formErrorMessage, fieldErrorMessage, FormModel } from '../types/form'
 
 interface CustomFormProps {
-  formFields: FormField[];
-  onSubmit: (formData: { [key: string]: any }) => void;
+  formModel: FormModel;
+  children: any;
+  onSubmit: (formModel: FormModel, formData: { [key: string]: any }, formErrors: formErrorMessage) => void;
+  [any: string]: any,
 }
 
-const Form: React.FC<CustomFormProps> = ({ formFields, onSubmit }) => {
+
+const Form: React.FC<CustomFormProps> = ({ formModel, children, onSubmit }) => {
   const [formData, setFormData] = useState({} as Record<string, any>);
-  const [errors, setErrors] = useState({} as Record<string, any>);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-
-    setFormData({ ...formData, [name]: value });
-    const fieldModel = formFields.find((field) => field.name == name)
-    if (fieldModel) {
-      fieldModel.value = formData[name]
-    }
-    console.log('FieldModel : ', fieldModel)
-  };
+  const [formModelState, setFormModelState] = useState(formModel)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    let isValid = true;
-    const newErrors: Record<string, any> = {};
-    formFields.forEach((field) => {
+    let isFormError = false
+    const fieldKeys = Object.keys(formModelState.fields)
+    let formErrors: formErrorMessage = {}
+    fieldKeys.forEach((fieldName) => {
+      const field = formModelState.fields[fieldName]
+      formData[fieldName] = field.value
+      field.errors = []
       console.log(field.value)
-      if (field.validation && field.validation.required && !formData[field.name]) {
-        isValid = false;
-        newErrors[field.name] = "This field is required";
+      if (field.validation && field.validation.required && !formData[fieldName]) {
+        isFormError = true
+        field.errors = ["This field is required"];
+        formErrors[fieldName]= field.errors
       }
-      if (field.validation && field.validation.minLength && formData[field.name] && formData[field.name].length < field.validation.minLength) {
-        isValid = false;
-        newErrors[field.name] = `This field must be at least ${field.validation.minLength} characters`;
+      if (field.validation && field.validation.minLength && formData[fieldName] && formData[fieldName].length < field.validation.minLength) {
+        isFormError = true
+        field.errors = [`This field must be at least ${field.validation.minLength} characters`];
+        formErrors[fieldName]= field.errors
       }
+      console.log(fieldName, field.errors)
     });
-    if (!isValid) {
-      setErrors(newErrors);
-    } else {
-      setErrors({})
-      onSubmit(formData);
-    }
+    onSubmit(formModel, formData, formErrors);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      {formFields.map((field, index) => (
-        <div key={index}>
-          <label>
-            {field.label}
-            <input type={field.type} name={field.name} onChange={handleChange} />
-          </label>
-          {errors[field.name] && <p>{errors[field.name]}</p>}
-        </div>
-      ))}
+      {children}
       <button type="submit">Submit</button>
+
     </form>
   );
 };
