@@ -13,7 +13,7 @@ const loginFormModel = {
       value: '',
       validation: {
         required: true,
-        minLength: 0,
+        minLength: 3,
         maxLength: 10
       }
     },
@@ -24,7 +24,7 @@ const loginFormModel = {
       value: '',
       validation: {
         required: true,
-        minLength: 0,
+        minLength: 3,
         maxLength: 10
       }
     }

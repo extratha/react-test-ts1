@@ -28,9 +28,16 @@ const Form: React.FC<CustomFormProps> = ({ formModel, children, onSubmit }) => {
         field.errors = ["This field is required"];
         formErrors[fieldName]= field.errors
       }
+      console.log(formData[fieldName].length, field.validation.minLength)
       if (field.validation && field.validation.minLength && formData[fieldName] && formData[fieldName].length < field.validation.minLength) {
         isFormError = true
         field.errors = [`This field must be at least ${field.validation.minLength} characters`];
+
+        formErrors[fieldName]= field.errors
+      }
+      if (field.validation && field.validation.maxLength && formData[fieldName] && formData[fieldName].length > field.validation.maxLength) {
+        isFormError = true
+        field.errors = [`This field must be less than ${field.validation.maxLength} characters`];
         formErrors[fieldName]= field.errors
       }
       console.log(fieldName, field.errors)
